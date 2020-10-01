@@ -1,3 +1,4 @@
+const moment = require('moment');
 const { Schema, model } = require('mongoose');
 
 const PizzaSchema = new Schema({
@@ -9,13 +10,33 @@ const PizzaSchema = new Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
+    get: (createdAtVal) => moment(createdAtVal).format('MMM DD, YYY [at] hh:mm a')
   },
   size: {
     type: String,
     default: 'Large'
   },
-  toppings: []
+  toppings: [],
+  comments: [
+      {
+          type: Schema.Types.ObjectId,
+          ref: 'Comment'
+      }
+  ]
+},
+{
+    toJSON: {
+        virtuals: true,
+        getters: true
+    },
+    id: false
+}
+);
+
+//get total count of comments and replied on retieval
+PizzaSchema.virtual('commentCount').get(function() {
+    return this.comments.lengthk
 });
 
 // create the Pizza model using the PizzaSchema
